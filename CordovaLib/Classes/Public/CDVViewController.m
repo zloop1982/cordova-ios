@@ -37,7 +37,6 @@
 @property (nonatomic, readwrite, strong) NSMutableDictionary* pluginObjects;
 @property (nonatomic, readwrite, strong) NSMutableArray* startupPluginNames;
 @property (nonatomic, readwrite, strong) NSDictionary* pluginsMap;
-@property (nonatomic, readwrite, strong) NSArray* supportedOrientations;
 @property (nonatomic, readwrite, strong) id <CDVWebViewEngineProtocol> webViewEngine;
 
 @property (readwrite, assign) BOOL initialized;
@@ -82,9 +81,6 @@
         [self printMultitaskingInfo];
         [self printPlatformVersionWarning];
         self.initialized = YES;
-
-        // load config.xml settings
-        [self loadSettings];
     }
 }
 
@@ -116,8 +112,8 @@
 
 - (void)printPlatformVersionWarning
 {
-    if (!IsAtLeastiOSVersion(@"7.0")) {
-        NSLog(@"CRITICAL: For Cordova 4.0.0 and above, you will need to upgrade to at least iOS 7.0 or greater. Your current version of iOS is %@.",
+    if (!IsAtLeastiOSVersion(@"8.0")) {
+        NSLog(@"CRITICAL: For Cordova 4.0.0 and above, you will need to upgrade to at least iOS 8.0 or greater. Your current version of iOS is %@.",
             [[UIDevice currentDevice] systemVersion]
             );
     }
@@ -140,20 +136,31 @@
     NSLog(@"Multi-tasking -> Device: %@, App: %@", (backgroundSupported ? @"YES" : @"NO"), (![exitsOnSuspend intValue]) ? @"YES" : @"NO");
 }
 
-- (BOOL)URLisAllowed:(NSURL*)url
-{
-    return [self shouldAllowNavigationToURL:url];
+-(NSString*)configFilePath{
+    NSString* path = self.configFile ?: @"config.xml";
+
+    // if path is relative, resolve it against the main bundle
+    if(![path isAbsolutePath]){
+        NSString* absolutePath = [[NSBundle mainBundle] pathForResource:path ofType:nil];
+        if(!absolutePath){
+            NSAssert(NO, @"ERROR: %@ not found in the main bundle!", path);
+        }
+        path = absolutePath;
+    }
+
+    // Assert file exists
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        NSAssert(NO, @"ERROR: %@ does not exist. Please run cordova-ios/bin/cordova_plist_to_config_xml path/to/project.", path);
+        return nil;
+    }
+
+    return path;
 }
 
 - (void)parseSettingsWithParser:(NSObject <NSXMLParserDelegate>*)delegate
 {
     // read from config.xml in the app bundle
-    NSString* path = [[NSBundle mainBundle] pathForResource:@"config" ofType:@"xml"];
-
-    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        NSAssert(NO, @"ERROR: config.xml does not exist. Please run cordova-ios/bin/cordova_plist_to_config_xml path/to/project.");
-        return;
-    }
+    NSString* path = [self configFilePath];
 
     NSURL* url = [NSURL fileURLWithPath:path];
 
@@ -178,8 +185,12 @@
     self.settings = delegate.settings;
 
     // And the start folder/page.
-    self.wwwFolderName = @"www";
-    self.startPage = delegate.startPage;
+    if(self.wwwFolderName == nil){
+        self.wwwFolderName = @"www";
+    }
+    if(delegate.startPage && self.startPage == nil){
+        self.startPage = delegate.startPage;
+    }
     if (self.startPage == nil) {
         self.startPage = @"index.html";
     }
@@ -196,6 +207,14 @@
         appURL = [NSURL URLWithString:self.startPage];
     } else if ([self.wwwFolderName rangeOfString:@"://"].location != NSNotFound) {
         appURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", self.wwwFolderName, self.startPage]];
+    } else if([self.wwwFolderName rangeOfString:@".bundle"].location != NSNotFound){
+        // www folder is actually a bundle
+        NSBundle* bundle = [NSBundle bundleWithPath:self.wwwFolderName];
+        appURL = [bundle URLForResource:self.startPage withExtension:nil];
+    } else if([self.wwwFolderName rangeOfString:@".framework"].location != NSNotFound){
+        // www folder is actually a framework
+        NSBundle* bundle = [NSBundle bundleWithPath:self.wwwFolderName];
+        appURL = [bundle URLForResource:self.startPage withExtension:nil];
     } else {
         // CB-3005 strip parameters from start page to check if page exists in resources
         NSURL* startURL = [NSURL URLWithString:self.startPage];
@@ -254,6 +273,9 @@
 {
     [super viewDidLoad];
 
+    // Load settings
+    [self loadSettings];
+
     NSString* backupWebStorageType = @"cloud"; // default value
 
     id backupWebStorage = [self.settings cordovaSettingForKey:@"BackupWebStorage"];
@@ -261,7 +283,7 @@
         backupWebStorageType = backupWebStorage;
     }
     [self.settings setCordovaSetting:backupWebStorageType forKey:@"BackupWebStorage"];
-    
+
     [CDVLocalStorage __fixupDatabaseLocationsWithBackupType:backupWebStorageType];
 
     // // Instantiate the WebView ///////////////
@@ -269,9 +291,6 @@
     if (!self.webView) {
         [self createGapView];
     }
-
-    // register this viewcontroller with the NSURLProtocol, only after the User-Agent is set
-    [CDVURLProtocol registerViewController:self];
 
     // /////////////////
 
@@ -300,10 +319,11 @@
 
     // /////////////////
     NSURL* appURL = [self appUrl];
+    __weak __typeof__(self) weakSelf = self;
 
     [CDVUserAgentUtil acquireLock:^(NSInteger lockToken) {
-        _userAgentLockToken = lockToken;
-        [CDVUserAgentUtil setUserAgent:self.userAgent lockToken:lockToken];
+        // Fix the memory leak caused by the strong reference.
+        [weakSelf setLockToken:lockToken];
         if (appURL) {
             NSURLRequest* appReq = [NSURLRequest requestWithURL:appURL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:20.0];
             [self.webViewEngine loadRequest:appReq];
@@ -322,6 +342,106 @@
             }
         }
     }];
+    
+    // /////////////////
+    
+    NSString* bgColorString = [self.settings cordovaSettingForKey:@"BackgroundColor"];
+    UIColor* bgColor = [self colorFromColorString:bgColorString];
+    [self.webView setBackgroundColor:bgColor];
+}
+
+- (void)setLockToken:(NSInteger)lockToken
+{
+	_userAgentLockToken = lockToken;
+	[CDVUserAgentUtil setUserAgent:self.userAgent lockToken:lockToken];
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVViewWillAppearNotification object:nil]];
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVViewDidAppearNotification object:nil]];
+}
+
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVViewWillDisappearNotification object:nil]];
+}
+
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVViewDidDisappearNotification object:nil]];
+}
+
+-(void)viewWillLayoutSubviews
+{
+    [super viewWillLayoutSubviews];
+    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVViewWillLayoutSubviewsNotification object:nil]];
+}
+
+-(void)viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
+    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVViewDidLayoutSubviewsNotification object:nil]];
+}
+
+-(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVViewWillTransitionToSizeNotification object:[NSValue valueWithCGSize:size]]];
+}
+
+- (UIColor*)colorFromColorString:(NSString*)colorString
+{
+    // No value, nothing to do
+    if (!colorString) {
+        return nil;
+    }
+    
+    // Validate format
+    NSError* error = NULL;
+    NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:@"^(#[0-9A-F]{3}|(0x|#)([0-9A-F]{2})?[0-9A-F]{6})$" options:NSRegularExpressionCaseInsensitive error:&error];
+    NSUInteger countMatches = [regex numberOfMatchesInString:colorString options:0 range:NSMakeRange(0, [colorString length])];
+    
+    if (!countMatches) {
+        return nil;
+    }
+    
+    // #FAB to #FFAABB
+    if ([colorString hasPrefix:@"#"] && [colorString length] == 4) {
+        NSString* r = [colorString substringWithRange:NSMakeRange(1, 1)];
+        NSString* g = [colorString substringWithRange:NSMakeRange(2, 1)];
+        NSString* b = [colorString substringWithRange:NSMakeRange(3, 1)];
+        colorString = [NSString stringWithFormat:@"#%@%@%@%@%@%@", r, r, g, g, b, b];
+    }
+    
+    // #RRGGBB to 0xRRGGBB
+    colorString = [colorString stringByReplacingOccurrencesOfString:@"#" withString:@"0x"];
+    
+    // 0xRRGGBB to 0xAARRGGBB
+    if ([colorString hasPrefix:@"0x"] && [colorString length] == 8) {
+        colorString = [@"0xFF" stringByAppendingString:[colorString substringFromIndex:2]];
+    }
+    
+    // 0xAARRGGBB to int
+    unsigned colorValue = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:colorString];
+    if (![scanner scanHexInt:&colorValue]) {
+        return nil;
+    }
+    
+    // int to UIColor
+    return [UIColor colorWithRed:((float)((colorValue & 0x00FF0000) >> 16))/255.0
+                           green:((float)((colorValue & 0x0000FF00) >>  8))/255.0
+                            blue:((float)((colorValue & 0x000000FF) >>  0))/255.0
+                           alpha:((float)((colorValue & 0xFF000000) >> 24))/255.0];
 }
 
 - (NSArray*)parseInterfaceOrientations:(NSArray*)orientations
@@ -358,7 +478,12 @@
     return YES;
 }
 
-- (NSUInteger)supportedInterfaceOrientations
+// CB-12098
+#if __IPHONE_OS_VERSION_MAX_ALLOWED < 90000  
+- (NSUInteger)supportedInterfaceOrientations  
+#else  
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+#endif
 {
     NSUInteger ret = 0;
 
@@ -385,9 +510,12 @@
 
 - (UIView*)newCordovaViewWithFrame:(CGRect)bounds
 {
-    NSString* defaultWebViewEngineClass = @"CDVUIWebViewEngine";
+    NSString* defaultWebViewEngineClass = [self.settings cordovaSettingForKey:@"CordovaDefaultWebViewEngine"];
     NSString* webViewEngineClass = [self.settings cordovaSettingForKey:@"CordovaWebViewEngine"];
 
+    if (!defaultWebViewEngineClass) {
+        defaultWebViewEngineClass = @"CDVUIWebViewEngine";
+    }
     if (!webViewEngineClass) {
         webViewEngineClass = defaultWebViewEngineClass;
     }
@@ -395,8 +523,8 @@
     // Find webViewEngine
     if (NSClassFromString(webViewEngineClass)) {
         self.webViewEngine = [[NSClassFromString(webViewEngineClass) alloc] initWithFrame:bounds];
-        // if a webView engine returns nil (not supported by the current iOS version) or doesn't conform to the protocol, we use UIWebView
-        if (!self.webViewEngine || ![self.webViewEngine conformsToProtocol:@protocol(CDVWebViewEngineProtocol)]) {
+        // if a webView engine returns nil (not supported by the current iOS version) or doesn't conform to the protocol, or can't load the request, we use UIWebView
+        if (!self.webViewEngine || ![self.webViewEngine conformsToProtocol:@protocol(CDVWebViewEngineProtocol)] || ![self.webViewEngine canLoadRequest:[NSURLRequest requestWithURL:self.appUrl]]) {
             self.webViewEngine = [[NSClassFromString(defaultWebViewEngineClass) alloc] initWithFrame:bounds];
         }
     } else {
@@ -429,7 +557,7 @@
         _userAgent = [NSString stringWithFormat:@"%@ %@", localBaseUserAgent, appendUserAgent];
     } else {
         // Use our address as a unique number to append to the User-Agent.
-        _userAgent = [NSString stringWithFormat:@"%@ (%lld)", localBaseUserAgent, (long long)self];
+        _userAgent = localBaseUserAgent;
     }
     return _userAgent;
 }
@@ -480,112 +608,6 @@
     [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
 
     [super viewDidUnload];
-}
-
-#pragma mark Network Policy Plugin (Whitelist) hooks
-
-/* This implements the default policy for resource loading and navigation, if there
- * are no plugins installed which override the whitelist methods.
- */
-- (BOOL)defaultResourcePolicyForURL:(NSURL*)url
-{
-    /*
-     * If a URL is being loaded that's a file/http/https URL, just load it internally
-     */
-    if ([url isFileURL]) {
-        return YES;
-    }
-
-    /*
-     * all about: scheme urls are not handled
-     */
-    else if ([[url scheme] isEqualToString:@"about"]) {
-        return NO;
-    }
-
-    /*
-     * all data: scheme urls are handled
-     */
-    else if ([[url scheme] isEqualToString:@"data"]) {
-        return YES;
-    }
-
-    return NO;
-}
-
-- (BOOL)shouldAllowRequestForURL:(NSURL*)url
-{
-    BOOL anyPluginsResponded = NO;
-    BOOL shouldAllowRequest = NO;
-
-    for (NSString* pluginName in pluginObjects) {
-        CDVPlugin* plugin = [pluginObjects objectForKey:pluginName];
-        SEL selector = NSSelectorFromString(@"shouldAllowRequestForURL:");
-        if ([plugin respondsToSelector:selector]) {
-            anyPluginsResponded = YES;
-            shouldAllowRequest = ((BOOL (*)(id, SEL, id))objc_msgSend)(plugin, selector, url);
-            if (!shouldAllowRequest) {
-                break;
-            }
-        }
-    }
-
-    if (anyPluginsResponded) {
-        return shouldAllowRequest;
-    }
-
-    /* Default Policy */
-    return [self defaultResourcePolicyForURL:url];
-}
-
-- (BOOL)shouldAllowNavigationToURL:(NSURL*)url
-{
-    BOOL anyPluginsResponded = NO;
-    BOOL shouldAllowNavigation = NO;
-
-    for (NSString* pluginName in pluginObjects) {
-        CDVPlugin* plugin = [pluginObjects objectForKey:pluginName];
-        SEL selector = NSSelectorFromString(@"shouldAllowNavigationToURL:");
-        if ([plugin respondsToSelector:selector]) {
-            anyPluginsResponded = YES;
-            shouldAllowNavigation = ((BOOL (*)(id, SEL, id))objc_msgSend)(plugin, selector, url);
-            if (!shouldAllowNavigation) {
-                break;
-            }
-        }
-    }
-
-    if (anyPluginsResponded) {
-        return shouldAllowNavigation;
-    }
-
-    /* Default Policy */
-    return [self defaultResourcePolicyForURL:url];
-}
-
-- (BOOL)shouldOpenExternalURL:(NSURL*)url
-{
-    BOOL anyPluginsResponded = NO;
-    BOOL shouldOpenExternalURL = NO;
-
-    for (NSString* pluginName in pluginObjects) {
-        CDVPlugin* plugin = [pluginObjects objectForKey:pluginName];
-        SEL selector = NSSelectorFromString(@"shouldOpenExternalURL:");
-        if ([plugin respondsToSelector:selector]) {
-            anyPluginsResponded = YES;
-            shouldOpenExternalURL = ((BOOL (*)(id, SEL, id))objc_msgSend)(plugin, selector, url);
-            if (!shouldOpenExternalURL) {
-                break;
-            }
-        }
-    }
-
-    if (anyPluginsResponded) {
-        return shouldOpenExternalURL;
-    }
-
-    /* Default policy */
-    return NO;
 }
 
 #pragma mark CordovaCommands
@@ -746,7 +768,6 @@
 
 - (void)dealloc
 {
-    [CDVURLProtocol unregisterViewController:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     [CDVUserAgentUtil releaseLock:&_userAgentLockToken];

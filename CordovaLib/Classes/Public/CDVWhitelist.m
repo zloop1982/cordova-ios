@@ -64,7 +64,7 @@ NSString* const kCDVDefaultSchemeName = @"cdv-default-scheme";
         } else {
             _scheme = [NSRegularExpression regularExpressionWithPattern:[CDVWhitelistPattern regexFromPattern:scheme allowWildcards:NO] options:NSRegularExpressionCaseInsensitive error:nil];
         }
-        if ([host isEqualToString:@"*"]) {
+        if ([host isEqualToString:@"*"] || host == nil) {
             _host = nil;
         } else if ([host hasPrefix:@"*."]) {
             _host = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"([a-z0-9.-]*\\.)?%@", [CDVWhitelistPattern regexFromPattern:[host substringFromIndex:2] allowWildcards:false]] options:NSRegularExpressionCaseInsensitive error:nil];
@@ -88,7 +88,7 @@ NSString* const kCDVDefaultSchemeName = @"cdv-default-scheme";
 - (bool)matches:(NSURL*)url
 {
     return (_scheme == nil || [_scheme numberOfMatchesInString:[url scheme] options:NSMatchingAnchored range:NSMakeRange(0, [[url scheme] length])]) &&
-           (_host == nil || [_host numberOfMatchesInString:[url host] options:NSMatchingAnchored range:NSMakeRange(0, [[url host] length])]) &&
+           (_host == nil || ([url host] != nil && [_host numberOfMatchesInString:[url host] options:NSMatchingAnchored range:NSMakeRange(0, [[url host] length])])) &&
            (_port == nil || [[url port] isEqualToNumber:_port]) &&
            (_path == nil || [_path numberOfMatchesInString:[url path] options:NSMatchingAnchored range:NSMakeRange(0, [[url path] length])])
     ;
@@ -169,7 +169,7 @@ NSString* const kCDVDefaultSchemeName = @"cdv-default-scheme";
         self.whitelist = nil;
         self.permittedSchemes = nil;
     } else { // specific access
-        NSRegularExpression* parts = [NSRegularExpression regularExpressionWithPattern:@"^((\\*|[A-Za-z-]+)://)?(((\\*\\.)?[^*/:]+)|\\*)?(:(\\d+))?(/.*)?" options:0 error:nil];
+        NSRegularExpression* parts = [NSRegularExpression regularExpressionWithPattern:@"^((\\*|[A-Za-z-]+):/?/?)?(((\\*\\.)?[^*/:]+)|\\*)?(:(\\d+))?(/.*)?" options:0 error:nil];
         NSTextCheckingResult* m = [parts firstMatchInString:origin options:NSMatchingAnchored range:NSMakeRange(0, [origin length])];
         if (m != nil) {
             NSRange r;

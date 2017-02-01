@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3006BCEA1D1A859B0035385C /* libCordova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3006BCE91D1A859B0035385C /* libCordova.a */; };
 		3035621714104C34006C2D43 /* CDVWhitelistTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 30356213141049E1006C2D43 /* CDVWhitelistTests.m */; };
 		303A4072152124BB00182201 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 303A4070152124BB00182201 /* InfoPlist.strings */; };
 		303A4074152124BB00182201 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 303A4073152124BB00182201 /* main.m */; };
@@ -17,10 +18,11 @@
 		30B342F515224B360070E6A5 /* CDVWebViewTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 30B342F415224B360070E6A5 /* CDVWebViewTest.m */; };
 		30D1B08C15A2B36D0060C291 /* CDVBase64Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 30D1B08B15A2B36D0060C291 /* CDVBase64Tests.m */; };
 		30F8AE1D152129DA006625B3 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 30F8AE1C152129DA006625B3 /* www */; };
+		5C4C91761C2ACE450055AFC3 /* CDVViewControllerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C4C91751C2ACE450055AFC3 /* CDVViewControllerTest.m */; };
+		5C4C917B1C2AD44E0055AFC3 /* config-custom.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5C4C91771C2ACF130055AFC3 /* config-custom.xml */; };
 		686357B5141002F200DF4CF2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 686357B3141002F200DF4CF2 /* InfoPlist.strings */; };
 		686357BA141002F200DF4CF2 /* CDVPluginResultJSONSerializationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 686357B9141002F200DF4CF2 /* CDVPluginResultJSONSerializationTests.m */; };
 		7E91406017711D88002C6A3F /* CDVWebViewDelegateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E91405F17711D88002C6A3F /* CDVWebViewDelegateTests.m */; };
-		7ED95D5E1ABA2098008C4574 /* libCordova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7ED95D5D1ABA2098008C4574 /* libCordova.a */; };
 		7EF33BD71911ABA20048544E /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EF33BD61911ABA20048544E /* Default-568h@2x.png */; };
 		EB89634A15FE66EA00E12277 /* CDVInvokedUrlCommandTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB89634915FE66EA00E12277 /* CDVInvokedUrlCommandTests.m */; };
 		EB96677216ADBCF500D86CDF /* CDVUserAgentTest.m in Sources */ = {isa = PBXBuildFile; fileRef = EB96677116ADBCF500D86CDF /* CDVUserAgentTest.m */; };
@@ -40,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3006BCE91D1A859B0035385C /* libCordova.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCordova.a; path = "../Debug-iphonesimulator/libCordova.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		30356213141049E1006C2D43 /* CDVWhitelistTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDVWhitelistTests.m; sourceTree = "<group>"; };
 		303A4068152124BB00182201 /* CordovaLibApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CordovaLibApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		303A406F152124BB00182201 /* CordovaLibApp-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CordovaLibApp-Info.plist"; sourceTree = "<group>"; };
@@ -54,12 +57,13 @@
 		30B342F415224B360070E6A5 /* CDVWebViewTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDVWebViewTest.m; sourceTree = "<group>"; };
 		30D1B08B15A2B36D0060C291 /* CDVBase64Tests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDVBase64Tests.m; sourceTree = "<group>"; };
 		30F8AE1C152129DA006625B3 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; path = www; sourceTree = "<group>"; };
+		5C4C91751C2ACE450055AFC3 /* CDVViewControllerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDVViewControllerTest.m; sourceTree = "<group>"; };
+		5C4C91771C2ACF130055AFC3 /* config-custom.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "config-custom.xml"; sourceTree = "<group>"; };
 		686357A9141002F100DF4CF2 /* CordovaLibTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CordovaLibTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		686357B2141002F200DF4CF2 /* CordovaLibTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CordovaLibTests-Info.plist"; sourceTree = "<group>"; };
 		686357B4141002F200DF4CF2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		686357B9141002F200DF4CF2 /* CDVPluginResultJSONSerializationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CDVPluginResultJSONSerializationTests.m; sourceTree = "<group>"; };
 		7E91405F17711D88002C6A3F /* CDVWebViewDelegateTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDVWebViewDelegateTests.m; sourceTree = "<group>"; };
-		7ED95D5D1ABA2098008C4574 /* libCordova.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCordova.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/cordova-ios-hirjxekmjkchqifveonwrrdrhjqd/Build/Products/Debug-iphoneos/libCordova.a"; sourceTree = "<group>"; };
 		7EF33BD61911ABA20048544E /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		EB89634915FE66EA00E12277 /* CDVInvokedUrlCommandTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDVInvokedUrlCommandTests.m; sourceTree = "<group>"; };
 		EB96677116ADBCF500D86CDF /* CDVUserAgentTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDVUserAgentTest.m; sourceTree = "<group>"; };
@@ -76,7 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7ED95D5E1ABA2098008C4574 /* libCordova.a in Frameworks */,
+				3006BCEA1D1A859B0035385C /* libCordova.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +108,7 @@
 			children = (
 				7EF33BD61911ABA20048544E /* Default-568h@2x.png */,
 				F8EB14D0165FFD3200616F39 /* config.xml */,
+				5C4C91771C2ACF130055AFC3 /* config-custom.xml */,
 				EB3B34F4161B585D003DBE7D /* CordovaLibTests */,
 				303A406D152124BB00182201 /* CordovaLibApp */,
 				0867D69AFE84028FC02AAC07 /* Frameworks */,
@@ -115,7 +120,7 @@
 		0867D69AFE84028FC02AAC07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				7ED95D5D1ABA2098008C4574 /* libCordova.a */,
+				3006BCE91D1A859B0035385C /* libCordova.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -156,18 +161,19 @@
 		EB3B34F4161B585D003DBE7D /* CordovaLibTests */ = {
 			isa = PBXGroup;
 			children = (
+				30D1B08B15A2B36D0060C291 /* CDVBase64Tests.m */,
 				30610C9119AD9B95000B3781 /* CDVCommandDelegateTests.m */,
-				EBA7F20417962CCD001A0CE6 /* CDVStartPageTests.m */,
-				7E91405F17711D88002C6A3F /* CDVWebViewDelegateTests.m */,
-				EB96677116ADBCF500D86CDF /* CDVUserAgentTest.m */,
 				EBA3554415A731F100F4DE24 /* CDVFakeFileManager.h */,
 				EBA3554515A731F100F4DE24 /* CDVFakeFileManager.m */,
-				EBA3550F15A5F18900F4DE24 /* CDVWebViewTest.h */,
-				30B342F415224B360070E6A5 /* CDVWebViewTest.m */,
-				30D1B08B15A2B36D0060C291 /* CDVBase64Tests.m */,
 				EB89634915FE66EA00E12277 /* CDVInvokedUrlCommandTests.m */,
 				3062D1AD151D4D9D000D9128 /* CDVLocalStorageTests.m */,
 				686357B9141002F200DF4CF2 /* CDVPluginResultJSONSerializationTests.m */,
+				EBA7F20417962CCD001A0CE6 /* CDVStartPageTests.m */,
+				EB96677116ADBCF500D86CDF /* CDVUserAgentTest.m */,
+				5C4C91751C2ACE450055AFC3 /* CDVViewControllerTest.m */,
+				7E91405F17711D88002C6A3F /* CDVWebViewDelegateTests.m */,
+				EBA3550F15A5F18900F4DE24 /* CDVWebViewTest.h */,
+				30B342F415224B360070E6A5 /* CDVWebViewTest.m */,
 				30356213141049E1006C2D43 /* CDVWhitelistTests.m */,
 				686357B1141002F200DF4CF2 /* Supporting Files */,
 			);
@@ -202,7 +208,6 @@
 				686357A4141002F100DF4CF2 /* Sources */,
 				686357A5141002F100DF4CF2 /* Frameworks */,
 				686357A6141002F100DF4CF2 /* Resources */,
-				686357A7141002F100DF4CF2 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -253,6 +258,7 @@
 				7EF33BD71911ABA20048544E /* Default-568h@2x.png in Resources */,
 				303A4072152124BB00182201 /* InfoPlist.strings in Resources */,
 				30F8AE1D152129DA006625B3 /* www in Resources */,
+				5C4C917B1C2AD44E0055AFC3 /* config-custom.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,19 +289,6 @@
 			shellScript = "cp ../../CordovaLib/cordova.js \"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/www/cordova.js\"";
 			showEnvVarsInLog = 0;
 		};
-		686357A7141002F100DF4CF2 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -319,6 +312,7 @@
 				30B342F515224B360070E6A5 /* CDVWebViewTest.m in Sources */,
 				30D1B08C15A2B36D0060C291 /* CDVBase64Tests.m in Sources */,
 				EBA3554615A731F100F4DE24 /* CDVFakeFileManager.m in Sources */,
+				5C4C91761C2ACE450055AFC3 /* CDVViewControllerTest.m in Sources */,
 				EB89634A15FE66EA00E12277 /* CDVInvokedUrlCommandTests.m in Sources */,
 				EB96677216ADBCF500D86CDF /* CDVUserAgentTest.m in Sources */,
 				7E91406017711D88002C6A3F /* CDVWebViewDelegateTests.m in Sources */,
@@ -443,10 +437,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -455,16 +446,10 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "CordovaLibApp/CordovaLibApp-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/cordova-ios-hirjxekmjkchqifveonwrrdrhjqd/Build/Products/Debug-iphoneos",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../CordovaLib/Classes/Private/**";
@@ -480,24 +465,14 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(BUILT_PRODUCTS_DIR)/usr/local/include",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "CordovaLibApp/CordovaLibApp-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/cordova-ios-hirjxekmjkchqifveonwrrdrhjqd/Build/Products/Debug-iphoneos",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -515,11 +490,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -532,7 +503,7 @@
 					"$(BUILT_PRODUCTS_DIR)/include/Cordova/**",
 				);
 				INFOPLIST_FILE = "CordovaLibTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-all_load",
@@ -552,11 +523,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -567,7 +534,7 @@
 					"$(BUILT_PRODUCTS_DIR)/include/Cordova/**",
 				);
 				INFOPLIST_FILE = "CordovaLibTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-all_load",

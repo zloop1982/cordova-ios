@@ -26,9 +26,8 @@
 #import "CDVScreenOrientationDelegate.h"
 #import "CDVPlugin.h"
 #import "CDVWebViewEngineProtocol.h"
-#import "CDVURLRequestFilter.h"
 
-@interface CDVViewController : UIViewController <CDVScreenOrientationDelegate, CDVURLRequestFilter >{
+@interface CDVViewController : UIViewController <CDVScreenOrientationDelegate>{
     @protected
     id <CDVWebViewEngineProtocol> _webViewEngine;
     @protected
@@ -45,6 +44,7 @@
 @property (nonatomic, readonly, strong) NSMutableDictionary* settings;
 @property (nonatomic, readonly, strong) NSXMLParser* configParser;
 
+@property (nonatomic, readwrite, copy) NSString* configFile;
 @property (nonatomic, readwrite, copy) NSString* wwwFolderName;
 @property (nonatomic, readwrite, copy) NSString* startPage;
 @property (nonatomic, readonly, strong) CDVCommandQueue* commandQueue;
@@ -64,6 +64,12 @@
 @property (nonatomic, readwrite, copy) NSString* baseUserAgent;
 
 /**
+	Takes/Gives an array of UIInterfaceOrientation (int) objects
+	ex. UIInterfaceOrientationPortrait
+*/
+@property (nonatomic, readwrite, strong) NSArray* supportedOrientations;
+
+/**
  The address of the lock token used for controlling access to setting the user-agent
  */
 @property (nonatomic, readonly) NSInteger* userAgentLockToken;
@@ -73,18 +79,13 @@
 - (NSString*)appURLScheme;
 - (NSURL*)errorURL;
 
+- (UIColor*)colorFromColorString:(NSString*)colorString;
 - (NSArray*)parseInterfaceOrientations:(NSArray*)orientations;
 - (BOOL)supportsOrientation:(UIInterfaceOrientation)orientation;
 
 - (id)getCommandInstance:(NSString*)pluginName;
 - (void)registerPlugin:(CDVPlugin*)plugin withClassName:(NSString*)className;
 - (void)registerPlugin:(CDVPlugin*)plugin withPluginName:(NSString*)pluginName;
-
-- (BOOL)URLisAllowed:(NSURL*)url __attribute__((deprecated("Scheduled for removal in 5.0. Use shouldAllowRequestForURL, shouldAllowNavigationToURL or shouldOpenExternalURL instead.")));
-
-- (BOOL)shouldAllowRequestForURL:(NSURL*)url;
-- (BOOL)shouldAllowNavigationToURL:(NSURL*)url;
-- (BOOL)shouldOpenExternalURL:(NSURL*)url;
 
 - (void)parseSettingsWithParser:(NSObject <NSXMLParserDelegate>*)delegate;
 

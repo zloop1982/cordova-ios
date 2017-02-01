@@ -91,6 +91,11 @@
     return [[(UIWebView*)_engineWebView request] URL];
 }
 
+- (BOOL) canLoadRequest:(NSURLRequest*)request
+{
+    return (request != nil);
+}
+
 - (void)updateSettings:(NSDictionary*)settings
 {
     UIWebView* uiWebView = (UIWebView*)_engineWebView;
@@ -111,7 +116,7 @@
 
     // prevent webView from bouncing
     if (!bounceAllowed) {
-        if ([self.webView respondsToSelector:@selector(scrollView)]) {
+        if ([uiWebView respondsToSelector:@selector(scrollView)]) {
             ((UIScrollView*)[uiWebView scrollView]).bounces = NO;
         } else {
             for (id subview in self.webView.subviews) {
@@ -187,6 +192,11 @@
 - (id)forwardingTargetForSelector:(SEL)aSelector
 {
     return _engineWebView;
+}
+
+- (UIView*)webView
+{
+    return self.engineWebView;
 }
 
 @end

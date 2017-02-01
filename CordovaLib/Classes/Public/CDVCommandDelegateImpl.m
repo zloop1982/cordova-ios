@@ -155,7 +155,7 @@
 
 - (void)evalJs:(NSString*)js scheduledOnRunLoop:(BOOL)scheduledOnRunLoop
 {
-    js = [NSString stringWithFormat:@"try{cordova.require('cordova/exec').nativeEvalAndFetch(function(){%@})}catch(e){console.log('exeption nativeEvalAndFetch : '+e);};", js];
+    js = [NSString stringWithFormat:@"try{cordova.require('cordova/exec').nativeEvalAndFetch(function(){%@})}catch(e){console.log('exception nativeEvalAndFetch : '+e);};", js];
     if (scheduledOnRunLoop) {
         [self evalJsHelper:js];
     } else {
@@ -176,11 +176,6 @@
 - (NSString*)userAgent
 {
     return [_viewController userAgent];
-}
-
-- (BOOL)URLIsWhitelisted:(NSURL*)url
-{
-    return [_viewController shouldAllowNavigationToURL:url];
 }
 
 - (NSDictionary*)settings

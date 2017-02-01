@@ -84,6 +84,18 @@
     }
 }
 
+- (BOOL)defaultResourcePolicyForURL:(NSURL*)url
+{
+    /*
+     * If a URL is being loaded that's a file url, just load it internally
+     */
+    if ([url isFileURL]) {
+        return YES;
+    }
+    
+    return NO;
+}
+
 - (BOOL)webView:(UIWebView*)theWebView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType
 {
     NSURL* url = [request URL];
@@ -101,60 +113,38 @@
         return NO;
     }
 
-    if ([[url fragment] hasPrefix:@"%01"] || [[url fragment] hasPrefix:@"%02"]) {
-        // Delegate is called *immediately* for hash changes. This means that any
-        // calls to stringByEvaluatingJavascriptFromString will occur in the middle
-        // of an existing (paused) call stack. This doesn't cause errors, but may
-        // be unexpected to callers (exec callbacks will be called before exec() even
-        // returns). To avoid this, we do not do any synchronous JS evals by using
-        // flushCommandQueueWithDelayedJs.
-        NSString* inlineCommands = [[url fragment] substringFromIndex:3];
-        if ([inlineCommands length] == 0) {
-            // Reach in right away since the WebCore / Main thread are already synchronized.
-            [vc.commandQueue fetchCommandsFromJs];
-        } else {
-            inlineCommands = [inlineCommands stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-            [vc.commandQueue enqueueCommandBatch:inlineCommands];
-        }
-        // Switch these for minor performance improvements, and to really live on the wild side.
-        // Callbacks will occur in the middle of the location.hash = ... statement!
-        [(CDVCommandDelegateImpl*)self.enginePlugin.commandDelegate flushCommandQueueWithDelayedJs];
-        // [_commandQueue executePending];
-
-        // Although we return NO, the hash change does end up taking effect.
-        return NO;
-    }
-
     /*
      * Give plugins the chance to handle the url
      */
+    BOOL anyPluginsResponded = NO;
+    BOOL shouldAllowRequest = NO;
+    
     for (NSString* pluginName in vc.pluginObjects) {
         CDVPlugin* plugin = [vc.pluginObjects objectForKey:pluginName];
         SEL selector = NSSelectorFromString(@"shouldOverrideLoadWithRequest:navigationType:");
         if ([plugin respondsToSelector:selector]) {
-            if (((BOOL (*)(id, SEL, id, int))objc_msgSend)(plugin, selector, request, navigationType)) {
-                return NO;
+            anyPluginsResponded = YES;
+            shouldAllowRequest = (((BOOL (*)(id, SEL, id, int))objc_msgSend)(plugin, selector, request, navigationType));
+            if (!shouldAllowRequest) {
+                break;
             }
         }
+    }
+    
+    if (anyPluginsResponded) {
+        return shouldAllowRequest;
     }
 
     /*
      * Handle all other types of urls (tel:, sms:), and requests to load a url in the main webview.
      */
-    BOOL shouldAllowNavigation = [vc shouldAllowNavigationToURL:url];
+    BOOL shouldAllowNavigation = [self defaultResourcePolicyForURL:url];
     if (shouldAllowNavigation) {
         return YES;
     } else {
-        BOOL shouldOpenExternalURL = [vc shouldOpenExternalURL:url];
-        if (shouldOpenExternalURL) {
-            if ([[UIApplication sharedApplication] canOpenURL:url]) {
-                [[UIApplication sharedApplication] openURL:url];
-            } else { // handle any custom schemes to plugins
-                [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
-            }
-        }
+        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
     }
-
+    
     return NO;
 }
 
